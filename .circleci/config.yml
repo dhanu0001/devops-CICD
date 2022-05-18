@@ -35,9 +35,9 @@ jobs:
          name: Creating Artifacts
          working_directory: /home/circleci/project/webapp/target/
          command: |
-           mkdir /tmp/war-app
-           cp -r "/home/circleci/project/webapp/target/webapp.war" /tmp/war-app
+           mkdir C:\Users\H896619\Documents\code\apps\phpmyadmin\htdocs\tmp\war-app
+           cp -r "/home/circleci/project/webapp/target/webapp.war" C:\Users\H896619\Documents\code\apps\phpmyadmin\htdocs\tmp\war-app
 
       - store_artifacts:
-              path: /tmp/war-app
+              path: C:\Users\H896619\Documents\code\apps\phpmyadmin\htdocs\tmp\war-app
               destination: war-app
