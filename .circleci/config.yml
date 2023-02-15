@@ -48,7 +48,7 @@ jobs:
             mvn test
             mvn checkstyle:checkstyle
             # curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=$Project >result.json
-            #ls -lrt /home/circleci/project/target/
+            #ls -lrt /home/circleci/project/webapp/target/
             # mvn install -DskipTests
             # mvn sonar:sonar
             # ls -lrt /home/circleci/project/
@@ -65,5 +65,5 @@ jobs:
               #-Dsonar.java.binaries=target/test-classes/com/visualpathit/account/controllerTest/ \
               -Dsonar.junit.reportsPath=target/surefire-reports/ \
               -Dsonar.jacoco.reportsPath=target/jacoco.exec 
-              ls -lrt /home/circleci/project/target/my-reports
-              cat /home/circleci/project/target/my-reports/jacoco.csv 
+              ls -lrt /home/circleci/project/webapp/target/my-reports
+              cat/home/circleci/project/webapp/target/my-reports/jacoco.csv
