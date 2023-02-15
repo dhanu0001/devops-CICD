@@ -1,43 +1,69 @@
-# Java Maven CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-java/ for more details
-#
-version: 2
+version: 2.1
+
 jobs:
   build:
     docker:
-      # specify the version you desire here
-      - image: circleci/openjdk:11-jdk
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
+      - image: cimg/openjdk:11.0.16
+      # - image: circleci/node:14
     environment:
-      # Customize the JVM maximum heap limit
-      MAVEN_OPTS: -Xmx3200m
-
+      SONAR_TOKEN: 97e22ce748b6b6855d1f1fcd0e3ca2323abd0219
+      SONAR_PROJECT_KEY: saks-code-repo
+      SONAR_ORGANIZATION: dhanu0001
     steps:
       - checkout
-
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "pom.xml" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-
+      # - run:
+      #    command: |
+      #     # cd /home/circleci/project/
+      #     apt-get update
+      #     apt-get install -y jq checkstyle
+      #     wget http://www-eu.apache.org/dist/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz
+      #     tar xzf apache-maven-3.5.4-bin.tar.gz
+      #     ln -s apache-maven-3.5.4 maven
+      #     wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-3.3.0.1492-linux.zip
+      #     unzip ./sonar-scanner-cli-3.3.0.1492-linux.zip
+      #     export PATH=$PATH:/sonar-scanner-3.3.0.1492-linux/bin/
+      # - run:
+      #     name: Install dependencies
+      #     command: npm ci
+      # - run:
+      #     name: Run tests
+      #     command: npm test
       - run:
-         name: Build
-         command: mvn clean package
+          name: Install SonarScanner
+          command: |
+            wget http://www-eu.apache.org/dist/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz
+            tar xzf apache-maven-3.5.4-bin.tar.gz
+            rm apache-maven-3.5.4-bin.tar.gz
+            ln -s apache-maven-3.5.4 maven
+            wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.5.0.2216-linux.zip
+            unzip sonar-scanner-cli-4.5.0.2216-linux.zip
+            rm sonar-scanner-cli-4.5.0.2216-linux.zip
+            export PATH=$PATH:/sonar-scanner-3.3.0.1492-linux/bin/
+            # cd /home/circleci/project/
+            cd /home/circleci/project/
+            ls -lrt /home/circleci/project           
+            mvn clean install
+            mvn clean package
+            # mvn install -DskipTests
+            mvn test
+            mvn checkstyle:checkstyle
+            # curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=$Project >result.json
+            ls -lrt /home/circleci/project/target/
+            # mvn install -DskipTests
+            # mvn sonar:sonar
+            # ls -lrt /home/circleci/project/
       - run:
-         name: Creating Artifacts
-         working_directory: /home/circleci/project/webapp/target/
-         command: |
-           mkdir /tmp/war-app
-           cp -r "/home/circleci/project/webapp/target/webapp.war" /tmp/war-app
-
-      - store_artifacts:
-              path: /tmp/war-app
-              destination: war-app
+          name: Analyze with SonarCloud
+          command: |
+            ./sonar-scanner-4.5.0.2216-linux/bin/sonar-scanner \
+              -Dsonar.projectKey=saks-code-repo \
+              -Dsonar.organization=dhanu0001 \
+              -Dsonar.sources=/home/circleci/project/ \
+              -Dsonar.host.url=https://sonarcloud.io \
+              -Dsonar.login=97e22ce748b6b6855d1f1fcd0e3ca2323abd0219 \
+              #-Dsonar.sources=src/main/java/com/visualpathit/account \
+              #-Dsonar.java.binaries=target/test-classes/com/visualpathit/account/controllerTest/ \
+              -Dsonar.junit.reportsPath=target/surefire-reports/ \
+              -Dsonar.jacoco.reportsPath=target/jacoco.exec 
+              ls -lrt /home/circleci/project/target/my-reports
+              cat /home/circleci/project/target/my-reports/jacoco.csv 
